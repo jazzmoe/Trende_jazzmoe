@@ -22,7 +22,7 @@ smaWindow = 5
 lastList = []
 sma = []
 #plt.ion()
-fig=plt.figure()
+#fig=plt.figure()
 
 #time.sleep(samplingRate)
 # Run loop for 'totalTime' seconds and get every 'samplingRate'
