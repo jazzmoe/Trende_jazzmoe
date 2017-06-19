@@ -50,3 +50,5 @@ Data/crypto-currency/.Rhistory
 # custom files
 .key
 .csv
+krakenScript/balance.csv
+krakenScript/kraken.key
