@@ -46,3 +46,7 @@ Network Trash Folder
 Temporary Items
 .apdisk
 Data/crypto-currency/.Rhistory
+
+# custom files
+.key
+.csv

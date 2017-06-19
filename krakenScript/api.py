@@ -11,7 +11,7 @@ pairName = 'XXBTZEUR'
 # let the program run for X seconds ('totalTime')
 totalTime = 5*60
 # check the price every X seconds ('samplingRate')
-samplingRate = 5
+samplingRate = 3
 # if price falls by fallPerc or rises by risePerc (ín %)
 # do something
 fallPerc = 0.15
@@ -53,7 +53,6 @@ for nn in range(int(totalTime/samplingRate)):
 #		plt.xlabel('Time')
 #		plt.legend(['LAST', 'SMA'])
 #		plt.show()
-#		plt.pause(0.05)
 
 	time.sleep(samplingRate)
 
