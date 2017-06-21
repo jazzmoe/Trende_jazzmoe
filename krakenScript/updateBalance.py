@@ -56,13 +56,13 @@ balanceDf = balanceDf[['Ticker', 'Value']]
 # profit and loss calculations
 PL = totalValue - capitalStart
 PL_pct = PL/capitalStart
-plTable = {"Ticker" : ["PL", "PL%"],
-           "Value" : [PL, PL_pct]}
+plTable = {"Ticker" : ["", "Capital Start", "Total", "PL", "PL%"],
+           "Value" : ["", capitalStart, totalValue, PL, PL_pct]}
 plDf = pd.DataFrame(plTable)
 balanceDf = balanceDf.append(plDf)
 
-% write to excel file
-balanceDf.to_excel(ew, sheet_name="Balance")
+# write to excel file
+balanceDf.to_excel(ew, sheet_name="Balance", index=False)
 
 
 ## get closed orders
@@ -101,7 +101,7 @@ for nn in range(len(orderPairs)):
 
       orderDf = pd.DataFrame(orderTable)
       orderDf = orderDf[['Time', 'Pair', 'Vol', 'Cost', 'Price', 'Name']]
-      orderDf.to_excel(ew, sheet_name=currentPair)
+      orderDf.to_excel(ew, sheet_name=currentPair, index=False)
 
 ew.save() # don't forget to call save() or the excel file won't be created
 

@@ -52,3 +52,4 @@ Data/crypto-currency/.Rhistory
 .csv
 krakenScript/balance.csv
 krakenScript/kraken.key
+*.xlsx
