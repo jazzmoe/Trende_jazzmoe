@@ -56,31 +56,79 @@ f.close()
 
 
 ## get closed orders
-orderNames = []
-orderPair = []
-orderVol= []
-orderCost = []
-orderPrice = []
-orderTime = []
-orderFee = []
+XBTNames = []
+XBTPair = []
+XBTVol= []
+XBTCost = []
+XBTPrice = []
+XBTTime = []
+XBTFee = []
+BTCNames = []
+BTCPair = []
+BTCVol= []
+BTCCost = []
+BTCPrice = []
+BTCTime = []
+BTCFee = []
+ETHNames = []
+ETHPair = []
+ETHVol= []
+ETHCost = []
+ETHPrice = []
+ETHTime = []
+ETHFee = []
 orders = k.query_private("ClosedOrders")
 for key, values in orders["result"]["closed"].items():
-      orderNames.append(key)
-      orderPair.append(values["descr"]["pair"])
-      orderPrice.append(values["price"])
-      orderCost.append(values["cost"])
-      timeStr = datetime.datetime.fromtimestamp(values["closetm"]).strftime('%Y-%m-%d %H:%M:%S')
-      orderTime.append(timeStr)
-      orderFee.append(values["fee"])
-      orderVol.append(values["vol"])
-   
+      pair = values["descr"]["pair"]
+      if pair == "ETHCBT":
+            BTCNames.append(key)
+            BTCPair.append(pair)
+            BTCPrice.append(values["price"])
+            BTCCost.append(values["cost"])
+            timeStr = datetime.datetime.fromtimestamp(values["closetm"]).strftime('%Y-%m-%d %H:%M:%S')
+            BTCTime.append(timeStr)
+            BTCFee.append(values["fee"])
+            BTCVol.append(values["vol"])
+      elif pair == "ETHEUR":
+            ETHNames.append(key)
+            ETHPair.append(pair)
+            ETHPrice.append(values["price"])
+            ETHCost.append(values["cost"])
+            timeStr = datetime.datetime.fromtimestamp(values["closetm"]).strftime('%Y-%m-%d %H:%M:%S')
+            ETHTime.append(timeStr)
+            ETHFee.append(values["fee"])
+            ETHVol.append(values["vol"])
+      elif pair == "XBTEUR":
+            XBTNames.append(key)
+            XBTPair.append(pair)
+            XBTPrice.append(values["price"])
+            XBTCost.append(values["cost"])
+            timeStr = datetime.datetime.fromtimestamp(values["closetm"]).strftime('%Y-%m-%d %H:%M:%S')
+            XBTTime.append(timeStr)
+            XBTFee.append(values["fee"])
+            XBTVol.append(values["vol"])
+            
 # create a python dict
-dfTable = {"Time" : orderTime, 
-           'Pair' : orderPair,
-           'Vol' : orderVol,
-           'Cost' : orderCost,
-           'Price' : orderPrice,
-           'Name' : orderNames}
+xbtTable = {"Time" : XBTTime, 
+           'Pair' : XBTPair,
+           'Vol' : XBTVol,
+           'Cost' : XBTCost,
+           'Price' : XBTPrice,
+           'Name' : XBTNames}
+
+ethTable = {"Time" : ETHTime, 
+           'Pair' : ETHPair,
+           'Vol' : ETHVol,
+           'Cost' : ETHCost,
+           'Price' : ETHPrice,
+           'Name' : ETHNames}
+
+btcTable = {"Time" : BTCTime, 
+           'Pair' : BTCPair,
+           'Vol' : BTCVol,
+           'Cost' : BTCCost,
+           'Price' : BTCPrice,
+           'Name' : BTCNames}
 
 # python dict to pandas data frame
 df = pd.DataFrame.from_dict(dfTable)
@@ -88,7 +136,12 @@ df = df[['Time', 'Pair', 'Vol', 'Cost', 'Price', 'Name']]
 
 # write table to csv and excel file
 df.to_csv('tradeHistory.csv', sep='\t', index=False)
-df.to_excel('tradeHistory.xls', index=False)
+
+ew = pd.ExcelWriter('history.xlsx')
+pd.DataFrame(xbtTable).to_excel(ew, sheet_name='XBTEUR')
+pd.DataFrame(ethTable).to_excel(ew, sheet_name='ETHEUR')
+pd.DataFrame(btcTable).to_excel(ew, sheet_name='BTCETH')
+ew.save() # don't forget to call save() or the excel file won't be created
 
 
 """ To do:
