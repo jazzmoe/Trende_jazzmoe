@@ -80,7 +80,7 @@ ETHFee = []
 orders = k.query_private("ClosedOrders")
 for key, values in orders["result"]["closed"].items():
       pair = values["descr"]["pair"]
-      if pair == "ETHCBT":
+      if pair == "ETHXBT":
             BTCNames.append(key)
             BTCPair.append(pair)
             BTCPrice.append(values["price"])
@@ -130,17 +130,20 @@ btcTable = {"Time" : BTCTime,
            'Price' : BTCPrice,
            'Name' : BTCNames}
 
-# python dict to pandas data frame
-df = pd.DataFrame.from_dict(dfTable)
-df = df[['Time', 'Pair', 'Vol', 'Cost', 'Price', 'Name']]
 
-# write table to csv and excel file
-df.to_csv('tradeHistory.csv', sep='\t', index=False)
+# write table to excel file
+ew = pd.ExcelWriter('tradeHistory.xlsx')
+xbtDf = pd.DataFrame(xbtTable)
+xbtDf = xbtDf[['Time', 'Pair', 'Vol', 'Cost', 'Price', 'Name']]
+xbtDf.to_excel(ew, sheet_name='XBTEUR')
 
-ew = pd.ExcelWriter('history.xlsx')
-pd.DataFrame(xbtTable).to_excel(ew, sheet_name='XBTEUR')
-pd.DataFrame(ethTable).to_excel(ew, sheet_name='ETHEUR')
-pd.DataFrame(btcTable).to_excel(ew, sheet_name='BTCETH')
+ethDf = pd.DataFrame(ethTable)
+ethDf = ethDf[['Time', 'Pair', 'Vol', 'Cost', 'Price', 'Name']]
+ethDf.to_excel(ew, sheet_name='ETHEUR')
+
+btcDf = pd.DataFrame(btcTable)
+btcDf = btcDf[['Time', 'Pair', 'Vol', 'Cost', 'Price', 'Name']]
+btcDf.to_excel(ew, sheet_name='BTCETH')
 ew.save() # don't forget to call save() or the excel file won't be created
 
 
