@@ -57,7 +57,7 @@ balanceDf = balanceDf[['Ticker', 'Value']]
 PL = totalValue - capitalStart
 PL_pct = PL/capitalStart
 plTable = {"Ticker" : ["", "Capital Start", "Total", "PL", "PL%"],
-           "Value" : ["", capitalStart, totalValue, PL, PL_pct]}
+           "Value" : ["", capitalStart, totalValue, PL, str(round(100*PL_pct,2)) + '%']}
 plDf = pd.DataFrame(plTable)
 balanceDf = balanceDf.append(plDf)
 
