@@ -17,6 +17,9 @@ k.load_key('kraken.key')
 # get account balance
 balance = k.query_private('Balance')
 
+# open excel file to write to
+ew = pd.ExcelWriter('tradeHistory.xlsx')
+
 # total fiat investment in the beginning
 fiatInvestment = 565
 currentGBYTE = 0.11615008
@@ -25,125 +28,81 @@ currentIOT = 130.89
 # BTC und ETH Wert vom 19.06.2017
 capitalStart = 380.8477
 totalValue = 0
-# open csv file and permit writing in file
-f = open('balance.csv', 'w')
-f.write('Item' + '\t' + 'Quantity' + '\t' + 'Current Price\n')
 
+# open csv file and permit writing in file
+currentValue = []
+tickerName = []
 for items in balance["result"].items():
       if items[0] == 'XETH':
             ticker = k.query_public('Ticker',{'pair': 'XETHZEUR', 'count' : '10'})
-            currentValue = float(ticker["result"]["XETHZEUR"]["a"][0])*float(items[1])
-            totalValue += currentValue
+            currentValue.append(float(ticker["result"]["XETHZEUR"]["a"][0])*float(items[1]))
+            tickerName.append('XETH')
+            totalValue += currentValue[-1]
       elif items[0] == 'XXBT':
             ticker = k.query_public('Ticker',{'pair': 'XXBTZEUR', 'count' : '10'})
-            currentValue = float(ticker["result"]["XXBTZEUR"]["a"][0])*float(items[1])
-            totalValue += currentValue
+            currentValue.append(float(ticker["result"]["XXBTZEUR"]["a"][0])*float(items[1]))
+            totalValue += currentValue[-1]
+            tickerName.append('XXBT')
       elif items[0] == 'ZEUR':
-            currentValue = float(items[1]) 
-            totalValue += currentValue
-      f.write(items[0] + '\t' + '%.4f' % float(items[1]) + '\t' + '%.4f' % currentValue + '\n')
+            currentValue.append(float(items[1])) 
+            totalValue += currentValue[-1]
+            tickerName.append('ZEUR')
 
-f.write('\nTotal' + '\t' + '%.4f' % totalValue + '\n')
-f.write('Invested Capital' + '\t' + '%.4f' % capitalStart + '\n')
+balanceTable = {"Ticker" : tickerName,
+               "Value" : currentValue}
+balanceDf = pd.DataFrame(balanceTable)
+balanceDf = balanceDf[['Ticker', 'Value']]
 
-# calculations
+# profit and loss calculations
 PL = totalValue - capitalStart
-f.write('P&L' + '\t' + '%.4f' % PL + '\n')
 PL_pct = PL/capitalStart
-f.write('Return on Investment' + '\t' + '%.4f' % PL_pct + '\n')
+plTable = {"Ticker" : ["PL", "PL%"],
+           "Value" : [PL, PL_pct]}
+plDf = pd.DataFrame(plTable)
+balanceDf = balanceDf.append(plDf)
 
-f.close()
+% write to excel file
+balanceDf.to_excel(ew, sheet_name="Balance")
 
 
 ## get closed orders
-XBTNames = []
-XBTPair = []
-XBTVol= []
-XBTCost = []
-XBTPrice = []
-XBTTime = []
-XBTFee = []
-BTCNames = []
-BTCPair = []
-BTCVol= []
-BTCCost = []
-BTCPrice = []
-BTCTime = []
-BTCFee = []
-ETHNames = []
-ETHPair = []
-ETHVol= []
-ETHCost = []
-ETHPrice = []
-ETHTime = []
-ETHFee = []
 orders = k.query_private("ClosedOrders")
-for key, values in orders["result"]["closed"].items():
-      pair = values["descr"]["pair"]
-      if pair == "ETHXBT":
-            BTCNames.append(key)
-            BTCPair.append(pair)
-            BTCPrice.append(values["price"])
-            BTCCost.append(values["cost"])
-            timeStr = datetime.datetime.fromtimestamp(values["closetm"]).strftime('%Y-%m-%d %H:%M:%S')
-            BTCTime.append(timeStr)
-            BTCFee.append(values["fee"])
-            BTCVol.append(values["vol"])
-      elif pair == "ETHEUR":
-            ETHNames.append(key)
-            ETHPair.append(pair)
-            ETHPrice.append(values["price"])
-            ETHCost.append(values["cost"])
-            timeStr = datetime.datetime.fromtimestamp(values["closetm"]).strftime('%Y-%m-%d %H:%M:%S')
-            ETHTime.append(timeStr)
-            ETHFee.append(values["fee"])
-            ETHVol.append(values["vol"])
-      elif pair == "XBTEUR":
-            XBTNames.append(key)
-            XBTPair.append(pair)
-            XBTPrice.append(values["price"])
-            XBTCost.append(values["cost"])
-            timeStr = datetime.datetime.fromtimestamp(values["closetm"]).strftime('%Y-%m-%d %H:%M:%S')
-            XBTTime.append(timeStr)
-            XBTFee.append(values["fee"])
-            XBTVol.append(values["vol"])
+
+orderPairs = ["ETHXBT", "ETHEUR", "XBTEUR"]
+
+for nn in range(len(orderPairs)):
+      currentPair = orderPairs[nn]
+      orderNames = []
+      orderPair = []
+      orderVol= []
+      orderCost = []
+      orderPrice = []
+      orderTime = []
+      orderFee = []
+      for key, values in orders["result"]["closed"].items():
+            pair = values["descr"]["pair"]
+            if pair == currentPair:
+                  orderNames.append(key)
+                  orderPair.append(currentPair)
+                  orderPrice.append(values["price"])
+                  orderCost.append(values["cost"])
+                  timeStr = datetime.datetime.fromtimestamp(values["closetm"]).strftime('%Y-%m-%d %H:%M:%S')
+                  orderTime.append(timeStr)
+                  orderFee.append(values["fee"])
+                  orderVol.append(values["vol"])
             
-# create a python dict
-xbtTable = {"Time" : XBTTime, 
-           'Pair' : XBTPair,
-           'Vol' : XBTVol,
-           'Cost' : XBTCost,
-           'Price' : XBTPrice,
-           'Name' : XBTNames}
+      # create a python dict
+      orderTable = {"Time" : orderTime, 
+                 'Pair' : orderPair,
+                 'Vol' : orderVol,
+                 'Cost' : orderCost,
+                 'Price' : orderPrice,
+                 'Name' : orderNames}
 
-ethTable = {"Time" : ETHTime, 
-           'Pair' : ETHPair,
-           'Vol' : ETHVol,
-           'Cost' : ETHCost,
-           'Price' : ETHPrice,
-           'Name' : ETHNames}
+      orderDf = pd.DataFrame(orderTable)
+      orderDf = orderDf[['Time', 'Pair', 'Vol', 'Cost', 'Price', 'Name']]
+      orderDf.to_excel(ew, sheet_name=currentPair)
 
-btcTable = {"Time" : BTCTime, 
-           'Pair' : BTCPair,
-           'Vol' : BTCVol,
-           'Cost' : BTCCost,
-           'Price' : BTCPrice,
-           'Name' : BTCNames}
-
-
-# write table to excel file
-ew = pd.ExcelWriter('tradeHistory.xlsx')
-xbtDf = pd.DataFrame(xbtTable)
-xbtDf = xbtDf[['Time', 'Pair', 'Vol', 'Cost', 'Price', 'Name']]
-xbtDf.to_excel(ew, sheet_name='XBTEUR')
-
-ethDf = pd.DataFrame(ethTable)
-ethDf = ethDf[['Time', 'Pair', 'Vol', 'Cost', 'Price', 'Name']]
-ethDf.to_excel(ew, sheet_name='ETHEUR')
-
-btcDf = pd.DataFrame(btcTable)
-btcDf = btcDf[['Time', 'Pair', 'Vol', 'Cost', 'Price', 'Name']]
-btcDf.to_excel(ew, sheet_name='BTCETH')
 ew.save() # don't forget to call save() or the excel file won't be created
 
 
