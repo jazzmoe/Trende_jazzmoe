@@ -7,6 +7,8 @@ Created on Mon Jun 19 19:36:26 2017
 
 #
 import krakenex
+import datetime
+import pandas as pd
 
 # open API
 k = krakenex.API()
@@ -41,19 +43,55 @@ for items in balance["result"].items():
             totalValue += currentValue
       f.write(items[0] + '\t' + '%.4f' % float(items[1]) + '\t' + '%.4f' % currentValue + '\n')
 
-f.write('\nTotal' + '\t' + 'X' + '\t' + '%.4f' % totalValue + '\n')
-f.write('Invested Capital' + '\t' + 'X' + '\t' + '%.4f' % capitalStart + '\n')
+f.write('\nTotal' + '\t' + '%.4f' % totalValue + '\n')
+f.write('Invested Capital' + '\t' + '%.4f' % capitalStart + '\n')
 
 # calculations
 PL = totalValue - capitalStart
-f.write('P&L' + '\t' + 'X' + '\t' + '%.4f' % PL + '\n')
+f.write('P&L' + '\t' + '%.4f' % PL + '\n')
 PL_pct = PL/capitalStart
-f.write('Return on Investment' + '\t' + 'X' + '\t' + '%.4f' % PL_pct + '\n')
+f.write('Return on Investment' + '\t' + '%.4f' % PL_pct + '\n')
 
 f.close()
 
+
+## get closed orders
+orderNames = []
+orderPair = []
+orderVol= []
+orderCost = []
+orderPrice = []
+orderTime = []
+orderFee = []
+orders = k.query_private("ClosedOrders")
+for key, values in orders["result"]["closed"].items():
+      orderNames.append(key)
+      orderPair.append(values["descr"]["pair"])
+      orderPrice.append(values["price"])
+      orderCost.append(values["cost"])
+      timeStr = datetime.datetime.fromtimestamp(values["closetm"]).strftime('%Y-%m-%d %H:%M:%S')
+      orderTime.append(timeStr)
+      orderFee.append(values["fee"])
+      orderVol.append(values["vol"])
+   
+# create a python dict
+dfTable = {"Time" : orderTime, 
+           'Pair' : orderPair,
+           'Vol' : orderVol,
+           'Cost' : orderCost,
+           'Price' : orderPrice,
+           'Name' : orderNames}
+
+# python dict to pandas data frame
+df = pd.DataFrame.from_dict(dfTable)
+df = df[['Time', 'Pair', 'Vol', 'Cost', 'Price', 'Name']]
+
+# write table to csv and excel file
+df.to_csv('tradeHistory.csv', sep='\t', index=False)
+df.to_excel('tradeHistory.xls', index=False)
+
+
 """ To do:
-1. Trade history mit einbauen; 
 2. Simple trade orders angeben
 3. IOTA und Byteball hinzufügen
 4. Simples trading script schreiben: In Echtzeit Preise ziehen und bestimmte trading rules festlegen
