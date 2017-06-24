@@ -39,13 +39,15 @@ def updateBalance(k):
       bbAndIota = cf.iotaAndByteBallPrices()
       tickerName.append("ByteBall")
       currentPrice.append(bbAndIota[0])
-      currentValue.append("")
-      currentQuantity.append("")
+      currentValue.append(bbAndIota[0]*currentGBYTE)
+      currentQuantity.append(currentGBYTE)
+      totalValue += currentValue[-1]
       
       tickerName.append("IOTA")
       currentPrice.append(bbAndIota[1])
-      currentValue.append("")
-      currentQuantity.append("")
+      currentValue.append(bbAndIota[1]*currentIOT)
+      currentQuantity.append(currentIOT)
+      totalValue += currentValue[-1]
       
       balanceTable = {"Ticker" : tickerName,
                      "Value" : currentValue,
@@ -85,6 +87,7 @@ currentIOT = 130.89
 # BTC und ETH Wert vom 19.06.2017 380.8477
 # # 100 23.06.2017
 capitalStart = 480.8477
+capitalStart = 665
 
 # update Balance
 balanceDf = updateBalance(k)
