@@ -39,13 +39,13 @@ def updateBalance(k):
       bbAndIota = cf.iotaAndByteBallPrices()
       tickerName.append("ByteBall")
       currentPrice.append(bbAndIota[0])
-      currentValue.append(bbAndIota[0]*currentGBYTE)
+      currentValue.append(bbAndIota[0]*currentGBYTE*(1/1.12))
       currentQuantity.append(currentGBYTE)
       totalValue += currentValue[-1]
       
       tickerName.append("IOTA")
       currentPrice.append(bbAndIota[1])
-      currentValue.append(bbAndIota[1]*currentIOT)
+      currentValue.append(bbAndIota[1]*currentIOT*(1/1.12))
       currentQuantity.append(currentIOT)
       totalValue += currentValue[-1]
       
@@ -59,7 +59,7 @@ def updateBalance(k):
       # profit and loss calculations
       PL = totalValue - capitalStart
       PL_pct = PL/capitalStart
-      plTable = {"Ticker" : ["", "Capital Start", "Total", "PL", "PL%"],
+      plTable = {"Ticker" : ["", "Fiat Investment", "Total", "PL", "PL%"],
                  "Value" : ["", capitalStart, totalValue, PL, str(round(100*PL_pct,2)) + '%'],
                  "Price" : ["", "", "", "", ""],
                  "Quantity" : ["", "", "", "", ""]}
@@ -85,8 +85,9 @@ currentGBYTE = 0.11615008
 currentIOT = 130.89
 
 # BTC und ETH Wert vom 19.06.2017 380.8477
-# # 100 23.06.2017
-capitalStart = 480.8477
+# # +100 23.06.2017
+# capitalStart = 480.8477
+# including IOTA und GByte
 capitalStart = 665
 
 # update Balance
