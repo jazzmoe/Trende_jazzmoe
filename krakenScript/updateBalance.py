@@ -83,8 +83,9 @@ fiatInvestment = 665
 currentGBYTE = 0.11615008
 currentIOT = 130.89
 
-# BTC und ETH Wert vom 19.06.2017
-capitalStart = 380.8477
+# BTC und ETH Wert vom 19.06.2017 380.8477
+# # 100 23.06.2017
+capitalStart = 480.8477
 
 # update Balance
 balanceDf = updateBalance(k)
