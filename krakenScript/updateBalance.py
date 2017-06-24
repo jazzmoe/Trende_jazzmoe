@@ -20,33 +20,21 @@ def updateBalance(k):
       tickerName = []
       totalValue = 0
       for items in balance["result"].items():
-            if items[0] == 'XETH':
-                  ticker = k.query_public('Ticker',{'pair': 'XETHZEUR', 'count' : '10'})
-                  currentValue.append(float(ticker["result"]["XETHZEUR"]["a"][0])*float(items[1]))
-                  currentPrice.append(float(ticker["result"]["XETHZEUR"]["a"][0]))
-                  currentQuantity.append(float(items[1]))
-                  tickerName.append('XETH')
-                  totalValue += currentValue[-1]
-            elif items[0] == 'XLTC':
-                  ticker = k.query_public('Ticker',{'pair': 'XLTCZEUR', 'count' : '10'})
-                  currentValue.append(float(ticker["result"]["XLTCZEUR"]["a"][0])*float(items[1]))
-                  currentPrice.append(float(ticker["result"]["XLTCZEUR"]["a"][0]))
-                  currentQuantity.append(float(items[1]))
-                  totalValue += currentValue[-1]
-                  tickerName.append('XLTC')
-            elif items[0] == 'XXBT':
-                  ticker = k.query_public('Ticker',{'pair': 'XXBTZEUR', 'count' : '10'})
-                  currentValue.append(float(ticker["result"]["XXBTZEUR"]["a"][0])*float(items[1]))
-                  currentPrice.append(float(ticker["result"]["XXBTZEUR"]["a"][0]))
-                  currentQuantity.append(float(items[1]))
-                  totalValue += currentValue[-1]
-                  tickerName.append('XXBT')
-            else:
+            if items[0] == 'ZEUR':
                   currentValue.append(float(items[1])) 
                   currentQuantity.append(float(items[1]))
                   currentPrice.append("")
                   totalValue += currentValue[-1]
                   tickerName.append('ZEUR')
+            else:
+                  pairName = items[0] + 'ZEUR'
+                  ticker = k.query_public('Ticker',{'pair': pairName, 'count' : '10'})
+                  currentValue.append(float(ticker["result"][pairName]["a"][0])*float(items[1]))
+                  currentPrice.append(float(ticker["result"][pairName]["a"][0]))
+                  currentQuantity.append(float(items[1]))
+                  tickerName.append(items[0])
+                  totalValue += currentValue[-1]
+
       
       balanceTable = {"Ticker" : tickerName,
                      "Value" : currentValue,
