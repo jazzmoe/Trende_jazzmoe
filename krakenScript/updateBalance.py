@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 Created on Mon Jun 19 19:36:26 2017
 
 @author: kNUt
 """
 
-#
 import krakenex
 import datetime
 import pandas as pd
@@ -21,6 +20,7 @@ def updateBalance(k):
       tickerName = []
       totalValue = 0
       for items in balance["result"].items():
+<<<<<<< HEAD
             if items[0] == 'XETH':
                   ticker = k.query_public('Ticker',{'pair': 'XETHZEUR', 'count' : '10'})
                   currentValue.append(float(ticker["result"]["XETHZEUR"]["a"][0])*float(items[1]))
@@ -43,6 +43,16 @@ def updateBalance(k):
                   totalValue += currentValue[-1]
                   tickerName.append('XXBT')
             elif items[0] == 'ZEUR':
+=======
+            pair = items[0] + 'ZEUR'
+            if items[0] != 'ZEUR':
+                  ticker = k.query_public('Ticker',{'pair': pair, 'count' : '10'})
+                  currentValue.append(float(ticker["result"][pair]["a"][0])*float(items[1]))
+                  currentPrice.append(float(ticker["result"][pair]["a"][0]))
+                  tickerName.append(items[0])
+                  totalValue += currentValue[-1]
+            else:
+>>>>>>> 26ca1e68d1381ce7d1ffc4aa0196eb3ccc8523d7
                   currentValue.append(float(items[1])) 
                   currentQuantity.append(float(items[1]))
                   currentPrice.append("")
@@ -68,7 +78,6 @@ def updateBalance(k):
       balanceDf = balanceDf.append(plDf)
       return balanceDf
 
-
 ###############################################################################  
 ## Main Part
 # open API
@@ -81,7 +90,7 @@ k.load_key('kraken.key')
 ew = pd.ExcelWriter('tradeHistory.xlsx')
 
 # total fiat investment in the beginning
-fiatInvestment = 565
+fiatInvestment = 665
 currentGBYTE = 0.11615008
 currentIOT = 130.89
 
@@ -93,11 +102,15 @@ balanceDf = updateBalance(k)
 print(balanceDf)
 balanceDf.to_excel(ew, sheet_name="Balance", index=False)
 
-
 ## get closed orders
 orders = k.query_private("ClosedOrders")
 
+<<<<<<< HEAD
 orderPairs = ["ETHXBT", "ETHEUR", "LTCEUR", "XBTEUR"]
+=======
+# REPLACE BY AUTOMATIC NUMBER OF PAIRS IN THE BALANCE
+orderPairs = ["ETHXBT", "ETHEUR", "XBTEUR", "XLTCEUR"]
+>>>>>>> 26ca1e68d1381ce7d1ffc4aa0196eb3ccc8523d7
 
 for nn in range(len(orderPairs)):
       currentPair = orderPairs[nn]
@@ -133,8 +146,6 @@ for nn in range(len(orderPairs)):
       orderDf.to_excel(ew, sheet_name=currentPair, index=False)
 
 ew.save() # don't forget to call save() or the excel file won't be created
-
-
 
 
 ###############################################################################
