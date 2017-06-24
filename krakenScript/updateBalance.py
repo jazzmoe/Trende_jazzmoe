@@ -20,7 +20,6 @@ def updateBalance(k):
       tickerName = []
       totalValue = 0
       for items in balance["result"].items():
-<<<<<<< HEAD
             if items[0] == 'XETH':
                   ticker = k.query_public('Ticker',{'pair': 'XETHZEUR', 'count' : '10'})
                   currentValue.append(float(ticker["result"]["XETHZEUR"]["a"][0])*float(items[1]))
@@ -42,17 +41,7 @@ def updateBalance(k):
                   currentQuantity.append(float(items[1]))
                   totalValue += currentValue[-1]
                   tickerName.append('XXBT')
-            elif items[0] == 'ZEUR':
-=======
-            pair = items[0] + 'ZEUR'
-            if items[0] != 'ZEUR':
-                  ticker = k.query_public('Ticker',{'pair': pair, 'count' : '10'})
-                  currentValue.append(float(ticker["result"][pair]["a"][0])*float(items[1]))
-                  currentPrice.append(float(ticker["result"][pair]["a"][0]))
-                  tickerName.append(items[0])
-                  totalValue += currentValue[-1]
             else:
->>>>>>> 26ca1e68d1381ce7d1ffc4aa0196eb3ccc8523d7
                   currentValue.append(float(items[1])) 
                   currentQuantity.append(float(items[1]))
                   currentPrice.append("")
@@ -105,12 +94,8 @@ balanceDf.to_excel(ew, sheet_name="Balance", index=False)
 ## get closed orders
 orders = k.query_private("ClosedOrders")
 
-<<<<<<< HEAD
-orderPairs = ["ETHXBT", "ETHEUR", "LTCEUR", "XBTEUR"]
-=======
 # REPLACE BY AUTOMATIC NUMBER OF PAIRS IN THE BALANCE
 orderPairs = ["ETHXBT", "ETHEUR", "XBTEUR", "XLTCEUR"]
->>>>>>> 26ca1e68d1381ce7d1ffc4aa0196eb3ccc8523d7
 
 for nn in range(len(orderPairs)):
       currentPair = orderPairs[nn]
