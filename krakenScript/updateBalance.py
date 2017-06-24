@@ -80,19 +80,21 @@ k.load_key('kraken.key')
 ew = pd.ExcelWriter('tradeHistory.xlsx')
 
 # total fiat investment in the beginning
-fiatInvestment = 665
+fiatInvestment = 910
 currentGBYTE = 0.11615008
-currentIOT = 130.89
+currentIOT = 340 # not exactly: come are still Bitcoins
 
 # BTC und ETH Wert vom 19.06.2017 380.8477
 # # +100 23.06.2017
 # capitalStart = 480.8477
 # including IOTA und GByte
-capitalStart = 665
+capitalStart = 910
 
 # update Balance
 balanceDf = updateBalance(k)
 print(balanceDf)
+
+#to excel
 balanceDf.to_excel(ew, sheet_name="Balance", index=False)
 
 ## get closed orders
