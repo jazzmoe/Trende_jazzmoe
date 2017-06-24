@@ -17,6 +17,7 @@ def updateBalance(k):
       balance = k.query_private('Balance')
       currentValue = []
       currentPrice = []
+      currentQuantity = []
       tickerName = []
       totalValue = 0
       for items in balance["result"].items():
@@ -24,34 +25,46 @@ def updateBalance(k):
                   ticker = k.query_public('Ticker',{'pair': 'XETHZEUR', 'count' : '10'})
                   currentValue.append(float(ticker["result"]["XETHZEUR"]["a"][0])*float(items[1]))
                   currentPrice.append(float(ticker["result"]["XETHZEUR"]["a"][0]))
+                  currentQuantity.append(float(items[1]))
                   tickerName.append('XETH')
                   totalValue += currentValue[-1]
+            elif items[0] == 'XLTC':
+                  ticker = k.query_public('Ticker',{'pair': 'XLTCZEUR', 'count' : '10'})
+                  currentValue.append(float(ticker["result"]["XLTCZEUR"]["a"][0])*float(items[1]))
+                  currentPrice.append(float(ticker["result"]["XLTCZEUR"]["a"][0]))
+                  currentQuantity.append(float(items[1]))
+                  totalValue += currentValue[-1]
+                  tickerName.append('XLTC')
             elif items[0] == 'XXBT':
                   ticker = k.query_public('Ticker',{'pair': 'XXBTZEUR', 'count' : '10'})
                   currentValue.append(float(ticker["result"]["XXBTZEUR"]["a"][0])*float(items[1]))
                   currentPrice.append(float(ticker["result"]["XXBTZEUR"]["a"][0]))
+                  currentQuantity.append(float(items[1]))
                   totalValue += currentValue[-1]
                   tickerName.append('XXBT')
             elif items[0] == 'ZEUR':
                   currentValue.append(float(items[1])) 
+                  currentQuantity.append(float(items[1]))
                   currentPrice.append("")
                   totalValue += currentValue[-1]
                   tickerName.append('ZEUR')
       
       balanceTable = {"Ticker" : tickerName,
                      "Value" : currentValue,
-                     "Price" : currentPrice}
+                     "Price" : currentPrice,
+                     "Quantity" : currentQuantity}
       balanceDf = pd.DataFrame(balanceTable)
-      balanceDf = balanceDf[['Ticker', 'Value', 'Price']]
+      balanceDf = balanceDf[['Ticker', 'Value', 'Price', 'Quantity']]
       
       # profit and loss calculations
       PL = totalValue - capitalStart
       PL_pct = PL/capitalStart
       plTable = {"Ticker" : ["", "Capital Start", "Total", "PL", "PL%"],
                  "Value" : ["", capitalStart, totalValue, PL, str(round(100*PL_pct,2)) + '%'],
-                 "Price" : ["", "", "", "", ""]}
+                 "Price" : ["", "", "", "", ""],
+                 "Quantity" : ["", "", "", "", ""]}
       plDf = pd.DataFrame(plTable)
-      plDf = plDf[['Ticker', 'Value', 'Price']]
+      plDf = plDf[['Ticker', 'Value', 'Price', 'Quantity']]
       balanceDf = balanceDf.append(plDf)
       return balanceDf
 
@@ -84,7 +97,7 @@ balanceDf.to_excel(ew, sheet_name="Balance", index=False)
 ## get closed orders
 orders = k.query_private("ClosedOrders")
 
-orderPairs = ["ETHXBT", "ETHEUR", "XBTEUR"]
+orderPairs = ["ETHXBT", "ETHEUR", "LTCEUR", "XBTEUR"]
 
 for nn in range(len(orderPairs)):
       currentPair = orderPairs[nn]
