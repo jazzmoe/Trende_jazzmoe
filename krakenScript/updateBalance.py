@@ -8,6 +8,7 @@ Created on Mon Jun 19 19:36:26 2017
 import krakenex
 import datetime
 import pandas as pd
+import crawlerFunctions as cf
 
 ###############################################################################       
 # define update balance function
@@ -35,6 +36,16 @@ def updateBalance(k):
                   tickerName.append(items[0])
                   totalValue += currentValue[-1]
 
+      bbAndIota = cf.iotaAndByteBallPrices()
+      tickerName.append("ByteBall")
+      currentPrice.append(bbAndIota[0])
+      currentValue.append("")
+      currentQuantity.append("")
+      
+      tickerName.append("IOTA")
+      currentPrice.append(bbAndIota[1])
+      currentValue.append("")
+      currentQuantity.append("")
       
       balanceTable = {"Ticker" : tickerName,
                      "Value" : currentValue,
