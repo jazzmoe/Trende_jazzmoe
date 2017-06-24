@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 Created on Mon Jun 19 19:36:26 2017
 
@@ -61,7 +61,7 @@ k.load_key('kraken.key')
 ew = pd.ExcelWriter('tradeHistory.xlsx')
 
 # total fiat investment in the beginning
-fiatInvestment = 565
+fiatInvestment = 665
 currentGBYTE = 0.11615008
 currentIOT = 130.89
 
