@@ -36,17 +36,23 @@ def updateBalance(k):
                   tickerName.append(items[0])
                   totalValue += currentValue[-1]
 
-      bbAndIota = cf.iotaAndByteBallPrices()
+      othersPrices = cf.crawlPrices()
       tickerName.append("ByteBall")
-      currentPrice.append(bbAndIota[0])
-      currentValue.append(bbAndIota[0]*currentGBYTE*(1/1.12))
+      currentPrice.append(othersPrices[0])
+      currentValue.append(othersPrices[0]*currentGBYTE*(1/1.12))
       currentQuantity.append(currentGBYTE)
       totalValue += currentValue[-1]
       
       tickerName.append("IOTA")
-      currentPrice.append(bbAndIota[1])
-      currentValue.append(bbAndIota[1]*currentIOT*(1/1.12))
+      currentPrice.append(othersPrices[1])
+      currentValue.append(othersPrices[1]*currentIOT*(1/1.12))
       currentQuantity.append(currentIOT)
+      totalValue += currentValue[-1]
+
+      tickerName.append("Numeraire")
+      currentPrice.append(othersPrices[2])
+      currentValue.append(othersPrices[2]*currentNumeraire*(1/1.12))
+      currentQuantity.append(currentNumeraire)
       totalValue += currentValue[-1]
       
       balanceTable = {"Ticker" : tickerName,
@@ -80,15 +86,16 @@ k.load_key('kraken.key')
 ew = pd.ExcelWriter('tradeHistory.xlsx')
 
 # total fiat investment in the beginning
-fiatInvestment = 910
+fiatInvestment = 1110
 currentGBYTE = 0.11615008
 currentIOT = 340 # not exactly: come are still Bitcoins
+currentNumeraire = 0.83464286
 
 # BTC und ETH Wert vom 19.06.2017 380.8477
 # # +100 23.06.2017
 # capitalStart = 480.8477
 # including IOTA und GByte
-capitalStart = 910
+capitalStart = 1110
 
 # update Balance
 balanceDf = updateBalance(k)
@@ -100,7 +107,7 @@ balanceDf.to_excel(ew, sheet_name="Balance", index=False)
 ## get closed orders
 orders = k.query_private("ClosedOrders")
 
-# REPLACE BY AUTOMATIC NUMBER OF PAIRS IN THE BALANCE
+# REPLACE TO AUTOMATICE SCRIPT
 orderPairs = ["ETHXBT", "ETHEUR", "XBTEUR", "XLTCEUR"]
 
 for nn in range(len(orderPairs)):
@@ -140,9 +147,7 @@ ew.save() # don't forget to call save() or the excel file won't be created
 
 
 ###############################################################################
-""" To do:
-2. Simple trade orders angeben
-3. IOTA und Byteball hinzufügen
+"""
 4. Simples trading script schreiben: In Echtzeit Preise ziehen und bestimmte trading rules festlegen
 """
 

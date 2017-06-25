@@ -9,9 +9,10 @@ from bs4 import BeautifulSoup
 import urllib.request
 
 
-def iotaAndByteBallPrices():
+def crawlPrices():
       urls = ["https://coinmarketcap.com/currencies/byteball/", 
-             "https://coinmarketcap.com/currencies/iota/"]
+             "https://coinmarketcap.com/currencies/iota/",
+	     "https://coinmarketcap.com/assets/numeraire/"]
       
       prices = []
       for url in urls:
