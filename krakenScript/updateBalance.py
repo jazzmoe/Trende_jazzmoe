@@ -86,7 +86,7 @@ k.load_key('kraken.key')
 ew = pd.ExcelWriter('tradeHistory.xlsx')
 
 # total fiat investment in the beginning
-fiatInvestment = 1510
+fiatInvestment = 1410
 currentGBYTE = 0.11615008
 currentIOT = 340
 currentNumeraire = 0.83464286
@@ -95,7 +95,7 @@ currentNumeraire = 0.83464286
 # # +100 23.06.2017
 # capitalStart = 480.8477
 # including IOTA und GByte
-capitalStart = 1510
+capitalStart = 1410
 
 # update Balance
 balanceDf = updateBalance(k)
