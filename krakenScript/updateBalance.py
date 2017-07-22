@@ -27,6 +27,22 @@ def updateBalance(k):
                   currentPrice.append("")
                   totalValue += currentValue[-1]
                   tickerName.append('ZEUR')
+            elif items[0] == 'XXBT':
+                  pairName = 'BTCEUR'
+                  ticker = k.query_public('Ticker',{'pair': pairName, 'count' : '10'})
+                  currentValue.append(float(ticker["result"]['XXBTZEUR']["a"][0])*float(items[1]))
+                  currentPrice.append(float(ticker["result"]['XXBTZEUR']["a"][0]))
+                  currentQuantity.append(float(items[1]))
+                  tickerName.append(items[0])
+                  totalValue += currentValue[-1]
+            elif items[0] == 'EOS':
+                  pairName = 'EOSEUR'
+                  ticker = k.query_public('Ticker',{'pair': pairName, 'count' : '10'})
+                  currentValue.append(float(ticker["result"][pairName]["a"][0])*float(items[1]))
+                  currentPrice.append(float(ticker["result"][pairName]["a"][0]))
+                  currentQuantity.append(float(items[1]))
+                  tickerName.append(items[0])
+                  totalValue += currentValue[-1]
             else:
                   pairName = items[0] + 'ZEUR'
                   ticker = k.query_public('Ticker',{'pair': pairName, 'count' : '10'})
@@ -35,6 +51,7 @@ def updateBalance(k):
                   currentQuantity.append(float(items[1]))
                   tickerName.append(items[0])
                   totalValue += currentValue[-1]
+
 
       othersPrices = cf.crawlPrices()
       tickerName.append("ByteBall")
