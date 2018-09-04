@@ -19,6 +19,7 @@ d <- melt(df, id.vars="years")
 ggplot(d, aes(years,value, col=variable)) + 
   geom_point() + 
   stat_smooth() +
+  theme_bw() +
   xlim(1989, 2017) +
   xlab("Year") + 
   ylab("Percentage of population") + 
