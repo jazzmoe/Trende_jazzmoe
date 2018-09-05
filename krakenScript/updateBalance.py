@@ -27,6 +27,30 @@ def updateBalance(k):
                   currentPrice.append("")
                   totalValue += currentValue[-1]
                   tickerName.append('ZEUR')
+            elif items[0] == 'XXBT':
+                  pairName = 'BTCEUR'
+                  ticker = k.query_public('Ticker',{'pair': pairName, 'count' : '10'})
+                  currentValue.append(float(ticker["result"]['XXBTZEUR']["a"][0])*(float(items[1]) + externalBTC))
+                  currentPrice.append(float(ticker["result"]['XXBTZEUR']["a"][0]))
+                  currentQuantity.append(float(items[1]))
+                  tickerName.append(items[0])
+                  totalValue += currentValue[-1]
+            elif items[0] == 'EOS':
+                  pairName = 'EOSEUR'
+                  ticker = k.query_public('Ticker',{'pair': pairName, 'count' : '10'})
+                  currentValue.append(float(ticker["result"][pairName]["a"][0])*float(items[1]))
+                  currentPrice.append(float(ticker["result"][pairName]["a"][0]))
+                  currentQuantity.append(float(items[1]))
+                  tickerName.append(items[0])
+                  totalValue += currentValue[-1]
+            elif items[0] == 'XETH':
+                  pairName = 'XETHZEUR'
+                  ticker = k.query_public('Ticker',{'pair': pairName, 'count' : '10'})
+                  currentValue.append(float(ticker["result"][pairName]["a"][0])*(float(items[1]) + externalETH))
+                  currentPrice.append(float(ticker["result"][pairName]["a"][0]))
+                  currentQuantity.append(float(items[1]))
+                  tickerName.append(items[0])
+                  totalValue += currentValue[-1]
             else:
                   pairName = items[0] + 'ZEUR'
                   ticker = k.query_public('Ticker',{'pair': pairName, 'count' : '10'})
@@ -35,6 +59,7 @@ def updateBalance(k):
                   currentQuantity.append(float(items[1]))
                   tickerName.append(items[0])
                   totalValue += currentValue[-1]
+
 
       othersPrices = cf.crawlPrices()
       tickerName.append("ByteBall")
@@ -86,16 +111,26 @@ k.load_key('kraken.key')
 ew = pd.ExcelWriter('tradeHistory.xlsx')
 
 # total fiat investment in the beginning
+<<<<<<< HEAD
 fiatInvestment = 2060
+=======
+fiatInvestment = 3290
+>>>>>>> origin/master
 currentGBYTE = 0.11615008
 currentIOT = 340
 currentNumeraire = 0.83464286
+externalBTC = 0.3
+externalETH = 4
 
 # BTC und ETH Wert vom 19.06.2017 380.8477
 # # +100 23.06.2017
 # capitalStart = 480.8477
 # including IOTA und GByte
+<<<<<<< HEAD
 capitalStart = 2060
+=======
+capitalStart = 3290
+>>>>>>> origin/master
 
 # update Balance
 balanceDf = updateBalance(k)
