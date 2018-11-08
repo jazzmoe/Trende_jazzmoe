@@ -42,13 +42,33 @@ names(Train) <- str_to_lower(names(Train))
 Train <- Train %>% mutate(survived = as.factor(survived))
 glimpse(Train)
 
+# define test and training in test set
+TrainTest <- sample_n(Train, size = round(0.2*(nrow(Train))))
+Train <- Train[!(Train$passengerid %in% TrainTest$passengerid),]
+
 # EDA: exploratory data analysis
 
 ### Simple logistic regression
-Mod1 <- glm(survived ~ sex + fare, data = Train, family = binomial)
-summary(Mod1)
-Train <- Train %>% mutate(surv.mod1 = ifelse(predict(Mod1, type = "response") > 0.6, 1, 0))
-accuracy(Train$survived, Train$surv.mod1)
+Mod11 <- glm(survived ~ sex + fare, data = Train, family = "binomial", na.action = na.omit)
+TrainTest <- TrainTest %>% mutate(
+  surv.mod1 = ifelse(predict(Mod1, newdata = TrainTest, type = "response") > 0.5, 1, 0),
+  surv.mod1 = ifelse(is.na(surv.mod1), 0, identity(surv.mod1)))
+accuracy(TrainTest$survived, TrainTest$surv.mod1)
+
+# alternative / full model
+Mod11.1 <- glm(survived ~ sex + fare + pclass + age + parch + sibsp, data = Train, family = "binomial")
+summary(Mod1.1)
+TrainTest <- TrainTest %>% mutate(
+  surv.mod1.1 = ifelse(predict(Mod1.1, newdata = TrainTest, type = "response") > 0.5, 1, 0),
+  surv.mod1 = ifelse(is.na(surv.mod1), 0, identity(surv.mod1)))
+accuracy(TrainTest$survived, TrainTest$surv.mod1.1)
+
+# compare models
+lrtest(Mod1, Mod11.1) # probably missings in Mod1.1
+
+
+
+
 
 ### random effects model
 Mod2 <- glmer(survived ~ sex + fare + sibsp + (1 | pclass), data = Train, family = binomial)
