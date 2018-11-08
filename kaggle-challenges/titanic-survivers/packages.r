@@ -60,12 +60,17 @@ p.needed <- c("readr", # imports spreadsheet data (Wickham)
               "boot", # bootstrapping toolbox
               "psych", # descriptive statistics like describe()
               "rmarkdown", # basic rmarkdown package
-              "margins", # to compute margins for logistic regression
-              "sandwich", # to obtain heteroscedastic robust SEs
               "wesanderson",  # awesome color brewer
               "extrafont", # new nice fonts e.g. for ggplot)  
-              "ggthemes") # nice additional gg themes
-
+              "ggthemes",
+              "margins", # to compute margins for logistic regression
+              "sandwich", # to obtain heteroscedastic robust SEs
+              "lmtest", # package for linear model testing
+              "survival", # package for survival analysis
+              "lme4", # Linear Mixed-Effects Models
+              "ggpubr", # additional ggplot stuff | e.g common legends
+              "sjstats", # simplified statistical computations) # nice additional gg themes
+              "caret")
 # install packages which are not in installed.packages()
 packages <- rownames(installed.packages())
 p.to.install <- p.needed[!(p.needed %in% packages)]
