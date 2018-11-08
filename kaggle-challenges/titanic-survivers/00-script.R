@@ -73,9 +73,12 @@ summary(Mod2)
 Train <- Train %>% mutate(surv.mod2 = ifelse(predict(Mod2, type = "response") > 0.6, 1, 0))
 accuracy(Train$survived, Train$surv.mod2)
 
+# good source https://www.r-bloggers.com/evaluating-logistic-regression-models/
 ### machine learning logit (caret)
-trainData <- trainControl(method="cv", number = 10, savePredictions = TRUE)
-Mod3 <- train(survived ~ sex + fare + sibsp + pclass, 
+trainData <- trainControl(method = "boot", number = 10, savePredictions = TRUE)
+Mod3 <- train(survived ~ sex + fare + pclass + age + parch + sibsp, 
               data = Train, trControl = trainData, method = "glm", family = "binomial",
-              metric = ifelse(is.factor(survived), "Accuracy", "RMSE"))
+              metric = "Accuracy", na.action = na.omit)
 Mod3$pred
+summary(Mod3)
+print(Mod3)
