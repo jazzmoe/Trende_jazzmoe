@@ -67,9 +67,6 @@ accuracy(TrainTest$survived, TrainTest$surv.mod1.1)
 lrtest(Mod1, Mod11.1) # probably missings in Mod1.1
 
 
-
-
-
 ### random effects model
 Mod2 <- glmer(survived ~ sex + fare + sibsp + (1 | pclass), data = Train, family = binomial)
 summary(Mod2)
@@ -77,6 +74,8 @@ Train <- Train %>% mutate(surv.mod2 = ifelse(predict(Mod2, type = "response") > 
 accuracy(Train$survived, Train$surv.mod2)
 
 ### machine learning logit (caret)
-Mod3 <- train(survived ~ sex + fare + sibsp + pclass,  data = Train, method = "glm", family = "binomial")
-Train <- Train %>% mutate(surv.mod3 = predict(Mod3, type = "prob"))
-
+trainData <- trainControl(method="cv", number = 10, savePredictions = TRUE)
+Mod3 <- train(survived ~ sex + fare + sibsp + pclass, 
+              data = Train, trControl = trainData, method = "glm", family = "binomial",
+              metric = ifelse(is.factor(survived), "Accuracy", "RMSE"))
+Mod3$pred
