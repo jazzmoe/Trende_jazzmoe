@@ -43,9 +43,9 @@ names(Test) <- str_to_lower(names(Test))
 Train <- Train %>% mutate(survived = as.factor(survived))
 glimpse(Train)
 
-# define test and training in test set
-TrainTest <- sample_n(Train, size = round(0.2*(nrow(Train))))
-TrainTrain <- Train[!(Train$passengerid %in% TrainTest$passengerid),]
+### define test and training in test set; also: createResample() or createFolds()
+Testing <- sample_n(Train, size = round(0.2*(nrow(Train))))
+Training <- Train[!(Train$passengerid %in% Testing$passengerid),]
 
 #### EDA: exploratory data analysis
 Train %>% ggplot() + geom_histogram(aes(x = age))
@@ -57,39 +57,40 @@ table(Train$sibsp, Train$survived)
 chisq.test(Train$sibsp, Train$survived) # significant relationship
 
 ### Simple logistic regression
-Mod1 <- glm(survived ~ sex + fare, data = TrainTrain, family = "binomial", na.action = na.omit)
-TrainTest <- TrainTest %>% mutate(
-  surv.mod1 = ifelse(predict(Mod1, newdata = TrainTest, type = "response") > 0.6, 1, 0),
+Mod1 <- glm(survived ~ sex + fare, data = Training, family = "binomial", na.action = na.omit)
+Testing <- Testing %>% mutate(
+  surv.mod1 = ifelse(predict(Mod1, newdata = Testing, type = "response") > 0.6, 1, 0),
   surv.mod1 = ifelse(is.na(surv.mod1), 0, identity(surv.mod1)))
-accuracy(TrainTest$survived, TrainTest$surv.mod1)
+accuracy(Testing$survived, Testing$surv.mod1)
 
 # alternative / full model
-Mod1.1 <- glm(survived ~ sex + fare + pclass + age, data = TrainTrain, family = "binomial")
-TrainTest <- TrainTest %>% mutate(
-  surv.mod1.1 = ifelse(predict(Mod1.1, newdata = TrainTest, type = "response") > 0.6, 1, 0),
+Mod1.1 <- glm(survived ~ sex + fare + pclass + age, data = Training, family = "binomial")
+Testing <- Testing %>% mutate(
+  surv.mod1.1 = ifelse(predict(Mod1.1, newdata = Testing, type = "response") > 0.6, 1, 0),
   surv.mod1.1 = ifelse(is.na(surv.mod1), 0, identity(surv.mod1)))
-accuracy(TrainTest$survived, TrainTest$surv.mod1.1)
+accuracy(Testing$survived, Testing$surv.mod1.1)
 
 ### random effects model
-Mod2 <- glmer(survived ~ sex + fare + sibsp + (1 | pclass), data = TrainTrain, family = binomial)
+Mod2 <- glmer(survived ~ sex + fare + sibsp + (1 | pclass), data = Training, family = binomial)
 summary(Mod2)
-TrainTest <- TrainTest %>% mutate(
-  surv.mod2 = ifelse(predict(Mod2, newdata = TrainTest, type = "response") > 0.6, 1, 0))
-accuracy(TrainTest$survived, TrainTest$surv.mod2)
+Testing <- Testing %>% mutate(
+  surv.mod2 = ifelse(predict(Mod2, newdata = Testing, type = "response") > 0.6, 1, 0))
+accuracy(Testing$survived, Testing$surv.mod2)
 
 # good source https://www.r-bloggers.com/evaluating-logistic-regression-models/
-### machine learning logit (caret)
-trainData <- trainControl(method = "cv", number = 10, savePredictions = TRUE)
-Mod3 <- train(survived ~ sex + pclass + age + sibsp + parch + fare, 
-              data = Train, trControl = trainData, method = "rf", nTree = 100,
-              metric = "Accuracy", na.action = na.omit)
+### machine learning logit (caret) [random forest]
+trainData <- trainControl(method = "repeatedcv", number = 10, savePredictions = TRUE, repeats = 5)
+Mod3 <- train(survived ~ sex + pclass + fare + age + sibsp + parch, 
+              data = Training, trControl = trainData, method = "rf", nTree = 100,
+              metric = "Accuracy", na.action = na.omit, tuneLength = 5)
 confusionMatrix(Mod3)
 print(Mod3)
-accuracy(Mod3$pred$pred, Mod3$pred$obs)
-Mod3.pred <- ifelse(predict(Mod3, newdata = Test, type = "prob") > 0.5, 1, 0) %>% 
-  as_tibble() %>% rename("Died" = `0`, "Survived" = `1`)
 
+# test on Testing (without age)
+Mod3.pred <- predict(Mod3, newdata = Testing)
+accuracy(Testing$survived[which(!is.na(Testing$age))], Mod3.pred)
 
 ### create forecast
-Bench <- cbind(SubTemp, modpred = Mod3.pred$Survived)
-table(Bench$Survived, Bench$modpred)
+#How to forecast NAs in age an other independent vars
+#Bench <- cbind(SubTemp, modpred = Mod3.pred$Survived) 
+#table(Bench$Survived, Bench$modpred)
