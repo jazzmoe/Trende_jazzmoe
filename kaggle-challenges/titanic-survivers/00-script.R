@@ -79,7 +79,7 @@ accuracy(TrainTest$survived, TrainTest$surv.mod2)
 
 # good source https://www.r-bloggers.com/evaluating-logistic-regression-models/
 ### machine learning logit (caret)
-trainData <- trainControl(method = "boot", number = 10, savePredictions = TRUE)
+trainData <- trainControl(method = "cv", number = 10, savePredictions = TRUE)
 Mod3 <- train(survived ~ sex + pclass + age + sibsp + parch + fare, 
               data = Train, trControl = trainData, method = "rf", nTree = 100,
               metric = "Accuracy", na.action = na.omit)
