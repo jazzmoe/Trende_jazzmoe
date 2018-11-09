@@ -48,13 +48,16 @@ Testing <- sample_n(Train, size = round(0.2*(nrow(Train))))
 Training <- Train[!(Train$passengerid %in% Testing$passengerid),]
 
 #### EDA: exploratory data analysis
-Train %>% ggplot() + geom_histogram(aes(x = age))
-Train %>% ggplot() + geom_histogram(aes(x = fare))
-Train %>% ggplot() + geom_bar(aes(x = sex))
-Train %>% ggplot() + geom_bar(aes(x = pclass))
+p1 <- Train %>% ggplot() + geom_histogram(aes(x = age))
+p2 <- Train %>% ggplot() + geom_histogram(aes(x = fare))
+p3 <- Train %>% ggplot() + geom_bar(aes(x = sex))
+p4 <- Train %>% ggplot() + geom_bar(aes(x = pclass))
+p4 <- Train %>% ggplot() + geom_boxplot(aes(pclass, fare, group = pclass))
 
 table(Train$sibsp, Train$survived)
 chisq.test(Train$sibsp, Train$survived) # significant relationship
+
+# transform data
 
 ### Simple logistic regression
 Mod1 <- glm(survived ~ sex + fare, data = Training, family = "binomial", na.action = na.omit)

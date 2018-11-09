@@ -1,0 +1,35 @@
+---
+title: "WeTrainOnTestData: Titanic Survivers Classification"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+try(setwd("C:/Users/Moritz/OneDrive/GitHub/Trende_jazzmoe/kaggle-challenges/titanic-survivers"), silent = TRUE)
+# include pummy dir
+
+source("00-script.R")
+```
+
+## Intro
+
+Blabla
+
+## Exploratory Data Analysis
+
+blablablabla
+
+```{r}
+glimpse(Train)
+```
+
+## Training Models
+
+Plot fare and pclass
+
+```{r pressure, echo=FALSE}
+p4
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot. Didel-didel-dumm.
