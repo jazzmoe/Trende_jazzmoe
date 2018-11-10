@@ -8,6 +8,100 @@ Things to check
 -   make a dummy vor cabin no cabin | classify different cabin categories
 -   
 
+Data Documentation
+------------------
+
+<table style="width:100%;">
+<colgroup>
+<col width="9%" />
+<col width="39%" />
+<col width="43%" />
+<col width="3%" />
+<col width="3%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Definition</th>
+<th>Key</th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>survival</td>
+<td>Survival</td>
+<td>0 = No, 1 = Yes</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>pclass</td>
+<td>Ticket class</td>
+<td>1 = 1st, 2 = 2nd, 3 = 3rd</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>sex</td>
+<td>Sex</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Age</td>
+<td>Age in years</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>sibsp</td>
+<td># of siblings / spouses aboard the Titanic</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>parch</td>
+<td># of parents / children aboard the Titanic</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>ticket</td>
+<td>Ticket number</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>fare</td>
+<td>Passenger fare</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>cabin</td>
+<td>Cabin number</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>embarked</td>
+<td>Port of Embarkation</td>
+<td>C = Cherbourg, Q = Queenstown, S = Southampton</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
 Exploratory Data Analysis
 -------------------------
 

@@ -1,8 +1,6 @@
 ---
-title: "documentation"
-author: "jazzmoe"
-date: "November 9, 2018"
-output: pdf_document
+title: "WeTrainOnTestData: Titanic Survivers Classification"
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
@@ -14,16 +12,11 @@ try(setwd("C:/Users/Moritz/OneDrive/GitHub/Trende_jazzmoe/kaggle-challenges/tita
 source("00-script.R")
 ```
 
-## Things to check (Cross when done)
+## Things to check
 
-* Run regression on age and impute ages of missing values
-* ~~Make a dummy for cabin no cabin~~
-* Classify different cabin categories
-* Test simple logit model
-* Test random forest
-* Test other machine learning models
-* Investigate different variable selection | classify importance of variables for classification
-* Compare different models
+* Many age variables are missing which might cause bias | run regression on age and estimate ages of missing values
+* make a dummy for cabin no cabin | classify different cabin categories
+* 
 
 ## Data Documentation
 
@@ -49,13 +42,9 @@ glimpse(Train)
 p5
 p6
 ```
-
 ### Missing Data
-
-Numbers of NAs per variable.
-
 ```{r}
-naFrame[,c(2:12)] %>% kable
+naFrame %>% kable
 ```
 
 
@@ -70,16 +59,7 @@ Peoplo who embarked in Southhampton have significantly higher likelihood of dyin
 
 ### Age
 
-Impute age with a regression or some ML algo -> add imputed age to classification -> more information
-
 ## Training Models
 
 ### Random forrest with 10-fold cv
-
-```{r}
-print(Mod3)
-confusionMatrix(Mod3)
-```
-
 Best model so far Mod3 with accuracy of 0.83.
-

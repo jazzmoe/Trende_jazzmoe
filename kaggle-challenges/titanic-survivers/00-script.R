@@ -20,30 +20,14 @@ Train <- read_csv("./data/train.csv")
 Test <- read_csv("./data/test.csv")
 SubTemp <- read_csv("./data/gender_submission.csv")
 
-# Variable Notes
-# pclass: A proxy for socio-economic status (SES)
-# 1st = Upper
-# 2nd = Middle
-# 3rd = Lower
-# 
-# age: Age is fractional if less than 1. If the age is estimated, is it in the form of xx.5
-# 
-# sibsp: The dataset defines family relations in this way...
-# Sibling = brother, sister, stepbrother, stepsister
-# Spouse = husband, wife (mistresses and fiancés were ignored)
-# 
-# parch: The dataset defines family relations in this way...
-# Parent = mother, father
-# Child = daughter, son, stepdaughter, stepson
-# Some children travelled only with a nanny, therefore parch=0 for them.
-
 ### Data prep
 names(Train) <- str_to_lower(names(Train))
 names(Test) <- str_to_lower(names(Test))
 Train <- Train %>% mutate(survived = as.factor(survived),
                           pclass1 = ifelse(pclass == 1, 1, 0),
                           pclass2 = ifelse(pclass == 2, 1, 0),
-                          pclass3 = ifelse(pclass == 3, 1, 0))
+                          pclass3 = ifelse(pclass == 3, 1, 0),
+                          has.cabin = ifelse(!is.na(cabin), 1, 0))
                           
 ### define test and training in test set;
 splitInd <- createDataPartition(y = Train$survived, p = 0.2, list = FALSE)
@@ -59,25 +43,25 @@ p3 <- Train %>% ggplot() + geom_bar(aes(x = sex))
 p4 <- Train %>% ggplot() + geom_bar(aes(x = pclass))
 
 # variable correlations
-TrainCorr <- Train[,c(2, 3, 6, 7, 8, 10)]
+TrainCorr <- Train[,c(2, 3, 6, 7, 8, 10, 12, 16)]
 library(psych)
 p5 <- pairs.panels(TrainCorr) # corr coefficient
 var(as.matrix(TrainCorr), na.rm = TRUE) # variance matrix
 p6 <- Train %>% ggplot() + geom_boxplot(aes(pclass, fare, group = pclass))
 
-table(Train$sibsp, Train$survived)
-chisq.test(Train$sibsp, Train$survived) # significant relationship
+# test for statistical dependence
+sibsp.surv <- table(Train$sibsp, Train$survived)
+subsp.surv.chisq <- chisq.test(Train$sibsp, Train$survived) # significant relationship
 
+emb.surv <- table(Train$embarked, Train$survived)
+emb.surv.chisq <- chisq.test(Train$embarked, Train$survived) # significant relationship
 
+cabin.surv <- table(Train$has.cabin, Train$survived)
+cab.surv.chisq <- chisq.test(Train$has.cabin, Train$survived) # significant relationship
 
-
-
-#
-# make cabin dummy / having a cabin seems to be correlated with survival
-
+### treating NAs
 # impute age by running a regression on age
-#here
-
+naFrame <- purrr::map_df(Train, ~ sum(is.na(.x)))
 
 ##################################################################
 ### Simple logistic regression
@@ -94,6 +78,14 @@ Testing <- Testing %>% mutate(
   surv.mod1.1 = ifelse(is.na(surv.mod1), 0, identity(surv.mod1)))
 accuracy(Testing$survived, Testing$surv.mod1.1)
 
+# alternative 2
+Mod1.2 <- glm(survived ~ sex + pclass + embarked, data = Training, 
+              family = "binomial", na.action = na.omit)
+Testing <- Testing %>% mutate(
+  surv.mod1.2 = ifelse(predict(Mod1.2, newdata = Testing, type = "response") > 0.6, 1, 0),
+  surv.mod1.2 = ifelse(is.na(surv.mod1), 0, identity(surv.mod1.2)))
+accuracy(Testing$survived, Testing$surv.mod1.2)
+
 ### random effects model
 Mod2 <- glmer(survived ~ sex + fare + sibsp + (1 | pclass), data = Training, family = binomial)
 summary(Mod2)
@@ -104,7 +96,7 @@ accuracy(Testing$survived, Testing$surv.mod2)
 # good source https://www.r-bloggers.com/evaluating-logistic-regression-models/
 ### machine learning logit (caret) [random forest]
 trainData <- trainControl(method = "repeatedcv", number = 10, savePredictions = TRUE, repeats = 5)
-Mod3 <- train(survived ~ sex + pclass + fare + age + sibsp + parch, 
+Mod3 <- train(survived ~ sex + pclass + fare + age + embarked + has.cabin, 
               data = Training, trControl = trainData, method = "rf", nTree = 100,
               metric = "Accuracy", na.action = na.omit, tuneLength = 5)
 summary(Mod3)
