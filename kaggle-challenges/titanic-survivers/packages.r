@@ -70,7 +70,9 @@ p.needed <- c("readr", # imports spreadsheet data (Wickham)
               "lme4", # Linear Mixed-Effects Models
               "ggpubr", # additional ggplot stuff | e.g common legends
               "sjstats", # simplified statistical computations) # nice additional gg themes
-              "caret")
+              "caret",
+              "corrplot") #great correlation matrices
+
 # install packages which are not in installed.packages()
 packages <- rownames(installed.packages())
 p.to.install <- p.needed[!(p.needed %in% packages)]

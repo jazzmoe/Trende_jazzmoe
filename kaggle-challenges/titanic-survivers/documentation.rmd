@@ -19,6 +19,9 @@ source("00-script.R")
 * Run regression on age and impute ages of missing values
 * ~~Make a dummy for cabin no cabin~~
 * Classify different cabin categories
+* Classify "children" using age and parent/siblings variable
+* Search for special titles in the name category and test impact on sirvival rate
+  + a "Countess" might be more likely to survive than Mr. Huber
 * Test simple logit model
 * Test random forest
 * Test other machine learning models
@@ -40,14 +43,35 @@ source("00-script.R")
 | cabin    | Cabin number                               |                                                |
 | embarked | Port of Embarkation                        | C = Cherbourg, Q = Queenstown, S = Southampton |
 
+Variable Notes
+pclass: A proxy for socio-economic status (SES)
+1st = Upper
+2nd = Middle
+3rd = Lower
+
+age: Age is fractional if less than 1. If the age is estimated, is it in the form of xx.5
+
+sibsp: The dataset defines family relations in this way...
+Sibling = brother, sister, stepbrother, stepsister
+Spouse = husband, wife (mistresses and fiancés were ignored)
+
+parch: The dataset defines family relations in this way...
+Parent = mother, father
+Child = daughter, son, stepdaughter, stepson
+Some children travelled only with a nanny, therefore parch=0 for them.
+
 ## Exploratory Data Analysis
 
 Analyze here relationships of variables. z.B Plot of fare and pclass
 
 ```{r}
 glimpse(Train)
+p1
+p2
+p3
+p4
 p5
-p6
+pairs.panels(TrainCorr) # corr matrix
 ```
 
 ### Missing Data

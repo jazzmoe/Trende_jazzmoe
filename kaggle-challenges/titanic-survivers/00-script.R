@@ -41,13 +41,16 @@ p1 <- Train %>% ggplot() + geom_histogram(aes(x = age))
 p2 <- Train %>% ggplot() + geom_histogram(aes(x = fare))
 p3 <- Train %>% ggplot() + geom_bar(aes(x = sex))
 p4 <- Train %>% ggplot() + geom_bar(aes(x = pclass))
+p5 <- Train %>% ggplot() + geom_boxplot(aes(pclass, fare, group = pclass))
 
-# variable correlations
-TrainCorr <- Train[,c(2, 3, 6, 7, 8, 10, 12, 16)]
-library(psych)
-p5 <- pairs.panels(TrainCorr) # corr coefficient
-var(as.matrix(TrainCorr), na.rm = TRUE) # variance matrix
-p6 <- Train %>% ggplot() + geom_boxplot(aes(pclass, fare, group = pclass))
+# variable correlations | corr matrices
+TrainCorr <- Train[,c("survived", "pclass", "sex", "age", "sibsp", 
+                      "parch", "fare", "embarked", "has.cabin")]
+pairs.panels(TrainCorr) # corr coefficient
+
+CorrMat <- purrr::map_dfc(TrainCorr, ~ as.integer(.x)) %>% cor(.)
+# corrplot.mixed(TrainCorr, lower.col = "black", number.cex = .7)
+
 
 # test for statistical dependence
 sibsp.surv <- table(Train$sibsp, Train$survived)
