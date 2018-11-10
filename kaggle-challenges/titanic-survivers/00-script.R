@@ -6,7 +6,7 @@
 
 ########################################
 ### Setup
-
+rm(list = ls())
 source("packages.R")
 source("functions.R")
 # install.packages('e1071', dependencies=TRUE)
@@ -40,25 +40,46 @@ SubTemp <- read_csv("./data/gender_submission.csv")
 ### Data prep
 names(Train) <- str_to_lower(names(Train))
 names(Test) <- str_to_lower(names(Test))
-Train <- Train %>% mutate(survived = as.factor(survived))
-glimpse(Train)
-
-### define test and training in test set; also: createResample() or createFolds()
-Testing <- sample_n(Train, size = round(0.2*(nrow(Train))))
-Training <- Train[!(Train$passengerid %in% Testing$passengerid),]
+Train <- Train %>% mutate(survived = as.factor(survived),
+                          pclass1 = ifelse(pclass == 1, 1, 0),
+                          pclass2 = ifelse(pclass == 2, 1, 0),
+                          pclass3 = ifelse(pclass == 3, 1, 0))
+                          
+### define test and training in test set;
+splitInd <- createDataPartition(y = Train$survived, p = 0.2, list = FALSE)
+Testing <- Train[splitInd,]
+Training <- Train[-splitInd,]
 
 #### EDA: exploratory data analysis
+
+# single variables
 p1 <- Train %>% ggplot() + geom_histogram(aes(x = age))
 p2 <- Train %>% ggplot() + geom_histogram(aes(x = fare))
 p3 <- Train %>% ggplot() + geom_bar(aes(x = sex))
 p4 <- Train %>% ggplot() + geom_bar(aes(x = pclass))
-p4 <- Train %>% ggplot() + geom_boxplot(aes(pclass, fare, group = pclass))
+
+# variable correlations
+TrainCorr <- Train[,c(2, 3, 6, 7, 8, 10)]
+library(psych)
+p5 <- pairs.panels(TrainCorr) # corr coefficient
+var(as.matrix(TrainCorr), na.rm = TRUE) # variance matrix
+p6 <- Train %>% ggplot() + geom_boxplot(aes(pclass, fare, group = pclass))
 
 table(Train$sibsp, Train$survived)
 chisq.test(Train$sibsp, Train$survived) # significant relationship
 
-# transform data
 
+
+
+
+#
+# make cabin dummy / having a cabin seems to be correlated with survival
+
+# impute age by running a regression on age
+#here
+
+
+##################################################################
 ### Simple logistic regression
 Mod1 <- glm(survived ~ sex + fare, data = Training, family = "binomial", na.action = na.omit)
 Testing <- Testing %>% mutate(
@@ -86,6 +107,7 @@ trainData <- trainControl(method = "repeatedcv", number = 10, savePredictions = 
 Mod3 <- train(survived ~ sex + pclass + fare + age + sibsp + parch, 
               data = Training, trControl = trainData, method = "rf", nTree = 100,
               metric = "Accuracy", na.action = na.omit, tuneLength = 5)
+summary(Mod3)
 confusionMatrix(Mod3)
 print(Mod3)
 
