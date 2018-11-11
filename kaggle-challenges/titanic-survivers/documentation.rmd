@@ -16,17 +16,19 @@ source("00-script.R")
 
 ## Things to check (Cross when done)
 
-* Run regression on age and impute ages of missing values
+* ~~Run regression on age and impute ages of missing values~~ || review this: some fitted values are far off
 * ~~Make a dummy for cabin no cabin~~
 * Classify different cabin categories
-* Classify "children" using age and parent/siblings variable
-* Search for special titles in the name category and test impact on sirvival rate
+* ~~Classify "child" using age variable~~
+* Search for special titles in the name category and test impact on survival rate
   + a "Countess" might be more likely to survive than Mr. Huber
-* Test simple logit model
+* ~~Test simple logit model~~
 * Test random forest
 * Test other machine learning models
 * Investigate different variable selection | classify importance of variables for classification
 * Compare different models
+
+* CREATE TUNING GRID: And optimize parameter selection of RF ML model!
 
 ## Data Documentation
 
@@ -66,11 +68,9 @@ Analyze here relationships of variables. z.B Plot of fare and pclass
 
 ```{r}
 glimpse(Train)
-p1
-p2
-p3
-p4
-p5
+grid.arrange(p.survived, p.sex, p.age1, p.fare, p.pclass, p.fare.pclass, 
+             top = "Exploratory Data Analysis", 
+             nrow = 2)
 pairs.panels(TrainCorr) # corr matrix
 ```
 
@@ -79,7 +79,8 @@ pairs.panels(TrainCorr) # corr matrix
 Numbers of NAs per variable.
 
 ```{r}
-naFrame[,c(2:12)] %>% kable
+naTrainFrame[,c(2:12)] %>% kable
+naTestFrame[,c(2:11)] %>% kable
 ```
 
 
@@ -96,7 +97,10 @@ Peoplo who embarked in Southhampton have significantly higher likelihood of dyin
 
 Impute age with a regression or some ML algo -> add imputed age to classification -> more information
 
-## Training Models
+## Training 
+
+xvars used by some larry on kaggle: 
+PassengerId	Pclass	SibSp	Parch	FamilySize	Sex_female	Sex_male	Title_Master	Title_Miss	Title_Mr	Title_Mrs	Title_Rare	Age_type_Children	Age_type_Teenager	Age_type_Adult	Age_type_Elder	Em_type_C	Em_type_Q	Em_type_S	Fare_type_Low_fare	Fare_type_median_fare	Fare_type_Average_fare	Fare_type_high_fare
 
 ### Random forrest with 10-fold cv
 
@@ -105,5 +109,5 @@ print(Mod3)
 confusionMatrix(Mod3)
 ```
 
-Best model so far Mod3 with accuracy of 0.83.
+Best model so far Mod3 with accuracy of 0.85.
 
