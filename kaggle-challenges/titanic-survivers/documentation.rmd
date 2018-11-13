@@ -16,13 +16,20 @@ source("00-script.R")
 
 ## Things to check (Cross when done)
 
+* clean code: pool Test and Training in order to get better imputaton of age etc and exploratory data analysis!
+-> nice imputation of missing in this kernel: [https://www.kaggle.com/pliptor/divide-and-conquer-0-82296](https://www.kaggle.com/pliptor/divide-and-conquer-0-82296)
+
+
 * ~~Run regression on age and impute ages of missing values~~ || review this: some fitted values are far off
+* Model age using a machine learning regression to increase precision
 * ~~Make a dummy for cabin no cabin~~
 * Classify different cabin categories
 * ~~Classify "child" using age variable~~
 * Search for special titles in the name category and test impact on survival rate
   + a "Countess" might be more likely to survive than Mr. Huber
 * ~~Test simple logit model~~
+* make variable: when you are a member of family and some other member of family died you are also more likely to die
+* male variable: classify age and fare into bins e.g. percentiles
 * Test random forest
 * Test other machine learning models
 * Investigate different variable selection | classify importance of variables for classification
@@ -109,5 +116,14 @@ print(Mod3)
 confusionMatrix(Mod3)
 ```
 
-Best model so far Mod3 with accuracy of 0.85.
+Best model so far Mod.Submit with public accuracy of 0.77990. Used following setting:
+```{r}
+trainData <- trainControl(method = "repeatedcv", number = 10, repeats = 10, verboseIter = TRUE)
+Mod.Submit <- train(survived ~ sex + pclass + age.imp + 
+                      fare + embarked + family.size + child + title,
+                    metric = "Accuracy", data = Train, trControl = trainData, 
+                    method = "ranger", tuneLength = 9)
+confusionMatrix(Mod.Submit)
+```
+
 
