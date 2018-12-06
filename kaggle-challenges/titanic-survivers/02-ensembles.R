@@ -48,24 +48,23 @@ trControl <- trainControl(
 # X <- Training %>% select(c(SlogL, sex, cabin.class))
 
 # child.class, title, embarked, fare.imp, GID, family.size, has.cabin, has.age, sibsp, parch
-mod.list <- caretList(survived ~ SlogL + sex + cabin.class + age.imp + fare.imp + title + pclass, 
+mod.list <- caretList(survived ~ SlogL, 
                       data = Train2,
                       trControl = trControl,
                       metric = "Accuracy",
-                      methodList = c("ranger", "glmnet"),                    
-                      tuneList = list(
-                        glmnet2 = caretModelSpec(method = "glmnet", tuneGrid = 
-                                              expand.grid(alpha = 0:1,
-                                                          lambda = seq(0.0001, 1, length = 100))),
-                        ranger2 = caretModelSpec(method = "ranger", tuneGrid = 
-                                                   expand.grid(.mtry = c(1, 2, 3, 4, 5, 6, 7),
-                                                               .splitrule = c("gini"),
-                                                               .min.node.size = c(1, 2, 3)))))
+                      methodList = c("knn"))                    
+                      # tuneList = list(
+                      #   glmnet2 = caretModelSpec(method = "glmnet", tuneGrid = 
+                      #                         expand.grid(alpha = 0:1,
+                      #                                     lambda = seq(0.0001, 1, length = 100))),
+                      #   ranger2 = caretModelSpec(method = "ranger", tuneGrid = 
+                      #                              expand.grid(.mtry = c(1, 2, 3, 4, 5, 6, 7),
+                      #                                          .splitrule = c("gini"),
+                      #                                          .min.node.size = c(1, 2, 3)))))
 
 # inspect models
 resamps <- resamples(mod.list)
 modelCor(resamps)
-summary(resamps)
 xyplot(resamps, metric = "Accuracy") 
 dotplot(resamps, metric = "Accuracy")
 densityplot(resamps, metric = "Accuracy")
@@ -119,7 +118,7 @@ ens.pred <- predict(greedy.ens, newdata = Test2, type = "raw")
 
 #########
 ## create submission
-Test2$Survived <- predict(mod.list$ranger, newdata = Test2, type = "raw")
+Test2$Survived <- predict(mod.list$knn, newdata = Test2, type = "raw")
 Submission <- Test2 %>% select(c("passengerid", "Survived")) %>%
   mutate(Survived = ifelse(Survived == "Died", 0, 1)) %>%
   rename(PassengerId = passengerid)

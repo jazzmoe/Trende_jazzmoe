@@ -144,7 +144,7 @@ classifyTickets <- function(x) {
   return(x)
 }
 
-Train <- classifyTickets(Full)
+Full <- classifyTickets(Full)
 
 ### CREATE Group Belonging Variable
 # ticket and fare groups
@@ -171,18 +171,18 @@ Full$GID <- factor(Full$GID)
 
 # BUILD SLogL
 # define function to compute log likelihood of a/(1-a)
-logL <- function(a) {
-  a <- as.character(a)
-  sum = length(a)
-  p <- length(a[a == "Survived"])
-  q <- length(a[a == "Died"])
-  loga <- log(p/q)
-  return(loga)
+logl <- function(a) {
+  a <- max(a,0.1); # avoids log(0)
+  a <- min(a,0.9); # avoids division by 0
+  return (log(a/(1-a)));
 }
 
-SLogL.sex.pclass <- Full[which(Full$dset == "Train"),] %>% 
+
+SLogL.sex.pclass <- Train %>% 
   dplyr::group_by(sex, pclass) %>% 
-  dplyr::summarize(SlogL = logL(survived))
+  dplyr::summarize(SlogL = logl(mean(survived))) %>% ungroup %>% 
+  mutate(pclass = factor(pclass, labels = c("First", "Second", "Third")),
+         sex = as.factor(sex))
 print(SLogL.sex.pclass)
 
 Full <- left_join(Full, SLogL.sex.pclass, by = c("sex", "pclass"))
@@ -190,10 +190,12 @@ Full <- left_join(Full, SLogL.sex.pclass, by = c("sex", "pclass"))
 ### adjust logL for certain groups
 
 #increase logL for groups with survivors
+Full$survived2 <- ifelse(is.na(Full$survived), NA, ifelse(Full$survived == "Died", 0, 1))
 ticket.stats <- Full %>% group_by(ticket) %>% 
-  summarize(l = length(survived), 
-            na = sum(is.na(survived)), 
-            c = sum(as.numeric(survived), na.rm = T))
+  summarize(l = length(survived2), 
+            na = sum(is.na(survived2)), 
+            c = sum(survived2, na.rm=T))
+
 for (i in 1:nrow(ticket.stats)) {
   plist <- which(Full$ticket == ticket.stats$ticket[i])
   if(ticket.stats$na[i] > 0 & ticket.stats$l[i] > 1 & ticket.stats$c[i] > 0) {
@@ -203,14 +205,20 @@ for (i in 1:nrow(ticket.stats)) {
 
 # penalizing singles
 sconst <- -2.1
-Full$SlogL[Full$GID == "Single"] <- Full$SlogL[Full$GID == "Single"] - sconst;
+Full$SlogL[Full$GID == "Single"] <- Full$SlogL[Full$GID == "Single"] - sconst
 
 # penalizing large groups
-Full$SlogL[Full$ticket.freq >  7] <- Full$SlogL[Full$ticket.freq > 7]  - 3
+Full$SlogL[Full$ticket.freq ==  7] <- Full$SlogL[Full$ticket.freq == 7]  - 3
+Full$SlogL[Full$ticket.freq ==  8] <- Full$SlogL[Full$ticket.freq == 8]  - 1
+Full$SlogL[Full$ticket.freq ==  9] <- Full$SlogL[Full$ticket.freq == 9]  - 3
+
+ggplot(Full[Full$dset == "Train",], aes(x=pclass, y=SlogL)) + 
+  geom_jitter(aes(color=survived)) + 
+  facet_grid(. ~ ticket.freq,  labeller=label_both) + 
+  labs(title="SLogL vs Pclass vs TFreq")
 
 # higher likelihood for minors
 Full$SlogL[Full$child.class == "Child"] <- 8
-
 
 ### EDA: EXPLORATORY DATA ANALYSIS | Analyze now survived relations with Train set
 
